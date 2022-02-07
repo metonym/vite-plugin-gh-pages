@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^2.7.13",
+    "vite-plugin-gh-pages": "^0.1.0"
+  }
+}
