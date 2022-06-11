@@ -10,7 +10,7 @@ export const pluginGhPages: PluginGhPages = (options = {}) => {
   let outDir = "";
 
   return {
-    name: "vite-plugin-gh-pages",
+    name: "vite:gh-pages",
     apply: "build",
     configResolved(resolvedConfig) {
       outDir = resolvedConfig.build.outDir;
