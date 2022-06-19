@@ -15,6 +15,7 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
   return {
     name: "vite:gh-pages",
     apply: "build",
+    enforce: "post",
     configResolved(resolvedConfig) {
       outDir = resolvedConfig.build.outDir;
     },
