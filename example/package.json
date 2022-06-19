@@ -1,4 +1,5 @@
 {
+  "name": "vite-plugin-gh-pages",
   "private": true,
   "scripts": {
     "dev": "vite dev",
