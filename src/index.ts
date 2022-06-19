@@ -22,6 +22,18 @@ const resolvePkgJson = (): null | { name?: string } => {
 export const ghPages = (options?: GhPagesOptions): Plugin => {
   let outDir = "";
 
+  const onError: GhPagesOptions["onError"] =
+    options?.onError ??
+    ((error) => {
+      console.log(error);
+    });
+
+  const onPublish: GhPagesOptions["onPublish"] =
+    options?.onPublish ??
+    (() => {
+      console.log("🎉 Published.");
+    });
+
   return {
     name: "vite:gh-pages",
     apply: "build",
@@ -47,13 +59,8 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
           ...options,
         },
         (error) => {
-          if (error) {
-            options?.onError?.(error);
-            console.log(error);
-            return;
-          }
-          options?.onPublish?.();
-          console.log("Published.");
+          if (error) return onError(error);
+          onPublish();
         }
       );
     },
