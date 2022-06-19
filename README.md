@@ -6,9 +6,10 @@ This plugin uses [gh-pages](https://github.com/tschaub/gh-pages) to publish your
 
 **Steps**
 
-1. Infer the publish directory using `config.build.outDir` from the `configResolved` Vite hook
-2. Create a `<outDir>/.nojekyll` file to opt-out of Jekyll mode
-3. Use `gh-pages` to publish the `outDir` to GitHub Pages
+1. Infer the publish directory from the `build.outDir` value
+2. Infer the GitHub Pages destination URL from the `package.json#name` if `base` is not set
+3. Create a `<outDir>/.nojekyll` file to opt-out of Jekyll mode
+4. Use `gh-pages` to publish the `outDir` to GitHub Pages
 
 ## Installation
 
@@ -25,7 +26,7 @@ pnpm i -D vite-plugin-gh-pages
 
 ## Usage
 
-You must specify a [public base path](https://vitejs.dev/guide/build.html#public-base-path) for your app to work on GitHub Pages.
+Vite requires a [public base path](https://vitejs.dev/guide/build.html#public-base-path) for your app to work on GitHub Pages.
 
 For example, if your repository name is "repo-name," `base` should be `/repo-name/`.
 
@@ -44,7 +45,7 @@ If no `base` value is provided, the plugin will attempt to infer the value using
 
 ## Options
 
-Pass additional options to `gh-pages`:
+Pass additional options to `gh-pages`.
 
 ```js
 ghPages({
@@ -165,9 +166,7 @@ interface GhPagesOptions {
 }
 ```
 
-## Optional callbacks
-
-### `onPublish`
+## `onPublish` / `onError` callbacks
 
 The `onPublish` callback will be invoked if `gh-pages` has successfully published the folder.
 
@@ -175,9 +174,12 @@ The `onPublish` callback will be invoked if `gh-pages` has successfully publishe
 
 ```js
 ghPages({
-  onPublish: () => {
+  /** @type {options: GhPagesOptions & { outDir: string } => void} */
+  onPublish: (options) => {
     // ...
   },
+
+  /** @type {(error: any) => void} **/
   onError: (error) => {
     // ...
   },

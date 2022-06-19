@@ -5,17 +5,18 @@ import type { Plugin } from "vite";
 import type { PublishOptions, publish } from "gh-pages";
 
 interface GhPagesOptions extends PublishOptions {
-  onPublish?: () => void;
+  onPublish?: (publishOptions: PublishOptions & { outDir: string }) => void;
   onError?: Parameters<typeof publish>[2];
 }
 
-const resolvePkgJson = (): null | { name?: string } => {
+const getPackageName = (): undefined | string => {
   const pkg_path = join(process.cwd(), "package.json");
 
   if (existsSync(pkg_path)) {
-    return JSON.parse(readFileSync(pkg_path, "utf-8"));
+    const pkg = JSON.parse(readFileSync(pkg_path, "utf-8"));
+    return pkg?.name ?? undefined;
   } else {
-    return null;
+    return undefined;
   }
 };
 
@@ -30,8 +31,8 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
 
   const onPublish: GhPagesOptions["onPublish"] =
     options?.onPublish ??
-    (() => {
-      console.log("🎉 Published.");
+    (({ outDir, branch }) => {
+      console.log(`🎉 Published \`${outDir}\` to branch \`${branch}\`.`);
     });
 
   return {
@@ -40,11 +41,7 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
     enforce: "post",
     config(config) {
       if (config.base === undefined) {
-        const pkg = resolvePkgJson();
-
-        if (pkg?.name) {
-          config.base = "/" + pkg.name + "/";
-        }
+        config.base = "/" + getPackageName() + "/";
       }
     },
     configResolved(resolvedConfig) {
@@ -52,17 +49,17 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
     },
     closeBundle() {
       writeFileSync(join(outDir, ".nojekyll"), "");
-      gp.publish(
-        outDir,
-        {
-          dotfiles: true,
-          ...options,
-        },
-        (error) => {
-          if (error) return onError(error);
-          onPublish();
-        }
-      );
+
+      const gpOptions = {
+        dotfiles: true,
+        branch: "gh-pages",
+        ...options,
+      };
+
+      gp.publish(outDir, gpOptions, (error) => {
+        if (error) return onError(error);
+        onPublish({ ...gpOptions, outDir });
+      });
     },
   };
 };
