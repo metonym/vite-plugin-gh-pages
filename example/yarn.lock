@@ -240,10 +240,10 @@ function-bind@^1.1.1:
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
   integrity sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==
 
-gh-pages@^3.2.3:
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/gh-pages/-/gh-pages-3.2.3.tgz#897e5f15e111f42af57d21d430b83e5cdf29472c"
-  integrity sha512-jA1PbapQ1jqzacECfjUaO9gV8uBgU6XNMV0oXLtfCX3haGLe5Atq8BxlrADhbD6/UdG9j6tZLWAkAybndOXTJg==
+gh-pages@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/gh-pages/-/gh-pages-4.0.0.tgz#bd7447bab7eef008f677ac8cc4f6049ab978f4a6"
+  integrity sha512-p8S0T3aGJc68MtwOcZusul5qPSNZCalap3NWbhRUZYu1YOdp+EjZ+4kPmRM8h3NNRdqw00yuevRjlkuSzCn7iQ==
   dependencies:
     async "^2.6.1"
     commander "^2.18.0"
@@ -480,12 +480,12 @@ universalify@^0.1.0:
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
   integrity sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==
 
-vite-plugin-gh-pages@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/vite-plugin-gh-pages/-/vite-plugin-gh-pages-0.1.0.tgz#b06b95fa9103226eb59cd1862c468c8d4286a2cb"
-  integrity sha512-fbpBHkgo8ehbg8142zgcDvD9l9fMMMFBBgF8Stv3ZdJXjNF6g5IgYHaGHHXcYwz63ZHmAnOhtGxdShD0X2CYtA==
+vite-plugin-gh-pages@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/vite-plugin-gh-pages/-/vite-plugin-gh-pages-0.2.0.tgz#675ea6f84e3fd86fa6813e98c1c553ad487e7ac6"
+  integrity sha512-wnvBUNc8lZF9IFjBgRLFxqFrp68TAqZYPi2Y7YaVmjVjNmlYdfb/dh2GU4eASX/QvwiTCLfkC/7/AseGHBq6Mg==
   dependencies:
-    gh-pages "^3.2.3"
+    gh-pages "^4.0.0"
 
 vite@^2.9.12:
   version "2.9.12"
