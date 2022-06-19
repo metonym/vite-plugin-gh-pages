@@ -4,11 +4,11 @@
 
 This plugin uses [gh-pages](https://github.com/tschaub/gh-pages) to publish your app to GitHub Pages after the build step.
 
-The plugin does the following:
+**Steps**
 
-- infer the publish directory using `config.build.outDir` from the `configResolved` Vite hook
-- create a `<outDir>/.nojekyll` file to opt-out of Jekyll mode
-- use `gh-pages` to publish the `outDir` to GitHub Pages
+1. Infer the publish directory using `config.build.outDir` from the `configResolved` Vite hook
+2. Create a `<outDir>/.nojekyll` file to opt-out of Jekyll mode
+3. Use `gh-pages` to publish the `outDir` to GitHub Pages
 
 ## Installation
 
