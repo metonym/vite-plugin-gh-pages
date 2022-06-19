@@ -163,6 +163,25 @@ interface GhPagesOptions {
 }
 ```
 
+## Optional callbacks
+
+### `onPublish`
+
+The `onPublish` callback will be invoked if `gh-pages` has successfully published the folder.
+
+`onError` will be called if an error occurred.
+
+```js
+ghPages({
+  onPublish: () => {
+    // ...
+  },
+  onError: (error) => {
+    // ...
+  },
+});
+```
+
 ## Changelog
 
 [CHANGELOG.md](CHANGELOG.md)

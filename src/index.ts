@@ -2,9 +2,14 @@ import { writeFileSync } from "fs";
 import { join } from "path";
 import gp from "gh-pages";
 import type { Plugin } from "vite";
-import type { PublishOptions } from "gh-pages";
+import type { PublishOptions, publish } from "gh-pages";
 
-export const ghPages = (options?: PublishOptions): Plugin => {
+interface GhPagesOptions extends PublishOptions {
+  onPublish?: () => void;
+  onError?: Parameters<typeof publish>[2];
+}
+
+export const ghPages = (options?: GhPagesOptions): Plugin => {
   let outDir = "";
 
   return {
@@ -22,7 +27,12 @@ export const ghPages = (options?: PublishOptions): Plugin => {
           ...options,
         },
         (error) => {
-          if (error) return console.log(error);
+          if (error) {
+            options?.onError?.(error);
+            console.log(error);
+            return;
+          }
+          options?.onPublish?.();
           console.log("Published.");
         }
       );
