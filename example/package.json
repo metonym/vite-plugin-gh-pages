@@ -7,6 +7,6 @@
   },
   "devDependencies": {
     "vite": "^2.9.12",
-    "vite-plugin-gh-pages": "^0.2.0"
+    "vite-plugin-gh-pages": "^0.3.0"
   }
 }
