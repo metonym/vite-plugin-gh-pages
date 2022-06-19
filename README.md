@@ -40,6 +40,8 @@ export default defineConfig({
 });
 ```
 
+If no `base` value is provided, the plugin will attempt to infer the value using the value of `package.json#name`.
+
 ## Options
 
 Pass additional options to `gh-pages`:

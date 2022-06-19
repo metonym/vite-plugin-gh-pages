@@ -1,4 +1,4 @@
-import { writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import gp from "gh-pages";
 import type { Plugin } from "vite";
@@ -9,6 +9,16 @@ interface GhPagesOptions extends PublishOptions {
   onError?: Parameters<typeof publish>[2];
 }
 
+const resolvePkgJson = (): null | { name?: string } => {
+  const pkg_path = join(process.cwd(), "package.json");
+
+  if (existsSync(pkg_path)) {
+    return JSON.parse(readFileSync(pkg_path, "utf-8"));
+  } else {
+    return null;
+  }
+};
+
 export const ghPages = (options?: GhPagesOptions): Plugin => {
   let outDir = "";
 
@@ -16,6 +26,15 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
     name: "vite:gh-pages",
     apply: "build",
     enforce: "post",
+    config(config) {
+      if (config.base === undefined) {
+        const pkg = resolvePkgJson();
+
+        if (pkg?.name) {
+          config.base = "/" + pkg.name + "/";
+        }
+      }
+    },
     configResolved(resolvedConfig) {
       outDir = resolvedConfig.build.outDir;
     },
