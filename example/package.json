@@ -5,7 +5,7 @@
     "build": "vite build"
   },
   "devDependencies": {
-    "vite": "^2.8.4",
+    "vite": "^2.9.12",
     "vite-plugin-gh-pages": "^0.1.0"
   }
 }
