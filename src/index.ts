@@ -1,8 +1,8 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import fs from "fs";
+import path from "path";
 import gp from "gh-pages";
-import type { Plugin } from "vite";
 import type { PublishOptions, publish } from "gh-pages";
+import type { Plugin } from "vite";
 
 interface GhPagesOptions extends PublishOptions {
   onPublish?: (publishOptions: PublishOptions & { outDir: string }) => void;
@@ -10,24 +10,19 @@ interface GhPagesOptions extends PublishOptions {
 }
 
 const getPackageName = (): undefined | string => {
-  const pkg_path = join(process.cwd(), "package.json");
+  const pkg_path = path.join(process.cwd(), "package.json");
 
-  if (existsSync(pkg_path)) {
-    const pkg = JSON.parse(readFileSync(pkg_path, "utf-8"));
-    return pkg?.name ?? undefined;
-  } else {
-    return undefined;
-  }
+  if (fs.existsSync(pkg_path)) return;
+
+  const pkg = JSON.parse(fs.readFileSync(pkg_path, "utf-8"));
+  return pkg?.name ?? undefined;
 };
 
 export const ghPages = (options?: GhPagesOptions): Plugin => {
   let outDir = "";
 
   const onError: GhPagesOptions["onError"] =
-    options?.onError ??
-    ((error) => {
-      console.log(error);
-    });
+    options?.onError ?? ((error) => console.log(error));
 
   const onPublish: GhPagesOptions["onPublish"] =
     options?.onPublish ??
@@ -48,7 +43,7 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
       outDir = resolvedConfig.build.outDir;
     },
     closeBundle() {
-      writeFileSync(join(outDir, ".nojekyll"), "");
+      fs.writeFileSync(path.join(outDir, ".nojekyll"), "");
 
       const gpOptions = {
         dotfiles: true,
