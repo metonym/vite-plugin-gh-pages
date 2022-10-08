@@ -4,8 +4,11 @@ import gp from "gh-pages";
 import type { PublishOptions, publish } from "gh-pages";
 import type { Plugin } from "vite";
 
+type CallbackPublishOptions = PublishOptions & { outDir: string };
+
 interface GhPagesOptions extends PublishOptions {
-  onPublish?: (publishOptions: PublishOptions & { outDir: string }) => void;
+  onBeforePublish?: (publishOptions: CallbackPublishOptions) => void;
+  onPublish?: (publishOptions: CallbackPublishOptions) => void;
   onError?: Parameters<typeof publish>[2];
 }
 
@@ -50,6 +53,8 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
         branch: "gh-pages",
         ...options,
       };
+
+      options?.onBeforePublish?.({ ...gpOptions, outDir });
 
       gp.publish(outDir, gpOptions, (error) => {
         if (error) return onError(error);
