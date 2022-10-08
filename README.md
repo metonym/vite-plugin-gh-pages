@@ -1,15 +1,8 @@
 # vite-plugin-gh-pages
 
-> Vite plugin for GitHub Pages.
+> Vite plugin to publish your app to GitHub Pages.
 
 This plugin uses [gh-pages](https://github.com/tschaub/gh-pages) to publish your app to GitHub Pages when running `vite build`.
-
-**Steps**
-
-1. Infer the publish directory from the `build.outDir` value
-2. Infer the GitHub Pages destination URL from the `package.json#name` if `base` is not set
-3. Create a `<outDir>/.nojekyll` file to opt-out of Jekyll mode
-4. Use `gh-pages` to publish the `outDir` to GitHub Pages
 
 ## Installation
 
@@ -32,20 +25,32 @@ For example, if your repository name is "repo-name," `base` should be `/repo-nam
 
 ```js
 // vite.config.js
-import { defineConfig } from "vite";
 import { ghPages } from "vite-plugin-gh-pages";
 
-export default defineConfig({
+/** @type {import('vite').UserConfig} */
+export default {
   base: "/repo-name/",
   plugins: [ghPages()],
-});
+};
 ```
 
-If no `base` value is provided, the plugin will attempt to infer the value using the value of `package.json#name`.
+If no value for `base` is specified, the plugin will attempt to infer the value using the value of `package.json#name`.
+
+```json
+// package.json
+{
+  // `base` can be omitted if `name` is specified
+  "name": "repo-name",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  }
+}
+```
 
 ## Options
 
-Pass additional options to `gh-pages`.
+Additional plugin options are passed to `gh-pages`.
 
 ```js
 ghPages({
@@ -53,7 +58,7 @@ ghPages({
 });
 ```
 
-### Signature
+<details><summary>API</summary>
 
 ```ts
 interface GhPagesOptions {
@@ -166,11 +171,13 @@ interface GhPagesOptions {
 }
 ```
 
-## `onBeforePublish` / `onPublish` / `onError` callbacks
+</details>
+
+## Callbacks
 
 ### `onBeforePublish`
 
-`onBeforePublish` is an optional callback invoked before publishing.
+`onBeforePublish` is invoked before publishing to GitHub Pages.
 
 This is useful for writing additional files to the `outDir`.
 
@@ -197,15 +204,21 @@ export default {
 
 `onPublish` is invoked if `gh-pages` has successfully published the folder.
 
-`onError` will be called if an error occurred.
-
 ```js
 ghPages({
   /** @type {options: GhPagesOptions & { outDir: string } => void} */
   onPublish: (options) => {
     // ...
   },
+});
+```
 
+### `onError`
+
+`onError` is called if a publishing error occurred.
+
+```js
+ghPages({
   /** @type {(error: any) => void} **/
   onError: (error) => {
     // ...

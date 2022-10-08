@@ -2,7 +2,7 @@
   "name": "vite-plugin-gh-pages",
   "version": "0.3.0",
   "license": "MIT",
-  "description": "Vite plugin for GitHub Pages",
+  "description": "Vite plugin to publish your app to GitHub Pages",
   "author": "Eric Liu (https://github.com/metonym)",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
