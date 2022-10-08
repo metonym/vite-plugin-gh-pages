@@ -2,7 +2,7 @@
 
 > Vite plugin for GitHub Pages.
 
-This plugin uses [gh-pages](https://github.com/tschaub/gh-pages) to publish your app to GitHub Pages after the build step.
+This plugin uses [gh-pages](https://github.com/tschaub/gh-pages) to publish your app to GitHub Pages when running `vite build`.
 
 **Steps**
 
@@ -166,9 +166,36 @@ interface GhPagesOptions {
 }
 ```
 
-## `onPublish` / `onError` callbacks
+## `onBeforePublish` / `onPublish` / `onError` callbacks
 
-The `onPublish` callback will be invoked if `gh-pages` has successfully published the folder.
+### `onBeforePublish`
+
+`onBeforePublish` is an optional callback invoked before publishing.
+
+This is useful for writing additional files to the `outDir`.
+
+```js
+import fs from "node:fs";
+import path from "node:path";
+import { ghPages } from "vite-plugin-gh-pages";
+
+/** @type {import('vite').UserConfig} */
+export default {
+  plugins: [
+    ghPages({
+      /** @type {options: GhPagesOptions & { outDir: string } => void} */
+      onBeforePublish: (options) => {
+        const CNAME = path.join(options.outDir, "CNAME");
+        fs.writeFileSync(CNAME, "...");
+      },
+    }),
+  ],
+};
+```
+
+### `onPublish`
+
+`onPublish` is invoked if `gh-pages` has successfully published the folder.
 
 `onError` will be called if an error occurred.
 
@@ -186,9 +213,7 @@ ghPages({
 });
 ```
 
-## Changelog
-
-[CHANGELOG.md](CHANGELOG.md)
+## [Changelog](CHANGELOG.md)
 
 ## License
 
