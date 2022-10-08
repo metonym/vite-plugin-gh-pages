@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import gp from "gh-pages";
 import type { PublishOptions, publish } from "gh-pages";
 import type { Plugin } from "vite";
