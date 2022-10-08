@@ -24,10 +24,9 @@ const getPackageName = (): undefined | string => {
 export const ghPages = (options?: GhPagesOptions): Plugin => {
   let outDir = "";
 
-  const onError: GhPagesOptions["onError"] =
-    options?.onError ?? ((error) => console.log(error));
+  const onError = options?.onError ?? ((error) => console.log(error));
 
-  const onPublish: GhPagesOptions["onPublish"] =
+  const onPublish =
     options?.onPublish ??
     (({ outDir, branch }) => {
       console.log(`🎉 Published \`${outDir}\` to branch \`${branch}\`.`);
