@@ -3,6 +3,7 @@ import path from "node:path";
 import gp from "gh-pages";
 import type { PublishOptions, publish } from "gh-pages";
 import type { Plugin } from "vite";
+import { getPackageName } from "./get-package-name";
 
 type CallbackPublishOptions = PublishOptions & { outDir: string };
 
@@ -11,15 +12,6 @@ interface GhPagesOptions extends PublishOptions {
   onPublish?: (publishOptions: CallbackPublishOptions) => void;
   onError?: Parameters<typeof publish>[2];
 }
-
-const getPackageName = (): undefined | string => {
-  const pkg_path = path.join(process.cwd(), "package.json");
-
-  if (fs.existsSync(pkg_path)) return;
-
-  const pkg = JSON.parse(fs.readFileSync(pkg_path, "utf-8"));
-  return pkg?.name ?? undefined;
-};
 
 export const ghPages = (options?: GhPagesOptions): Plugin => {
   let outDir = "";
