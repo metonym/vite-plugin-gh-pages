@@ -16,7 +16,7 @@
   "devDependencies": {
     "@types/gh-pages": "^3.2.1",
     "typescript": "^4.8.4",
-    "vitest": "^0.24.3"
+    "vitest": "^0.24.5"
   },
   "repository": {
     "type": "git",
