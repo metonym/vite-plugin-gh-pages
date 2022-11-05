@@ -36,11 +36,10 @@ export default {
 
 If no value for `base` is specified, the plugin will attempt to infer the value using the value of `package.json#name`.
 
-```json
+```js
 // package.json
 {
-  // `base` can be omitted if `name` is specified
-  "name": "repo-name",
+  "name": "repo-name", // `base` can be omitted if `name` is specified
   "scripts": {
     "dev": "vite",
     "build": "vite build"
