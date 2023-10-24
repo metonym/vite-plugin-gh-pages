@@ -1,7 +1,6 @@
+import gp, { type PublishOptions, type publish } from "gh-pages";
 import fs from "node:fs";
 import path from "node:path";
-import gp from "gh-pages";
-import type { PublishOptions, publish } from "gh-pages";
 import type { Plugin } from "vite";
 import { getPackageName } from "./get-package-name";
 
@@ -36,7 +35,7 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
     configResolved(resolvedConfig) {
       outDir = resolvedConfig.build.outDir;
     },
-    closeBundle() {
+    async closeBundle() {
       fs.writeFileSync(path.join(outDir, ".nojekyll"), "");
 
       const gpOptions = {
@@ -47,7 +46,7 @@ export const ghPages = (options?: GhPagesOptions): Plugin => {
 
       options?.onBeforePublish?.({ ...gpOptions, outDir });
 
-      gp.publish(outDir, gpOptions, (error) => {
+      await gp.publish(outDir, gpOptions, (error) => {
         if (error) return onError(error);
         onPublish({ ...gpOptions, outDir });
       });
