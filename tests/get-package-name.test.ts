@@ -1,25 +1,25 @@
-import path from "node:path";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { getPackageName } from "../src/get-package-name";
 
 describe("get-package-name", () => {
-  const mockCwd = vi.spyOn(process, "cwd");
-
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
-
   test("no package.json", () => {
+    const mockCwd = vi.spyOn(process, "cwd");
     mockCwd.mockReturnValue("/");
+
     expect(getPackageName()).toBeUndefined();
   });
 
   test("valid package.json without name", () => {
-    mockCwd.mockReturnValue(path.join(process.cwd(), "tests"));
+    const mockCwd = vi.spyOn(process, "cwd");
+    mockCwd.mockReturnValue("tests");
+
     expect(getPackageName()).toBeUndefined();
   });
 
   test("valid package.json", () => {
+    const mockCwd = vi.spyOn(process, "cwd");
+    mockCwd.mockReturnValue(".");
+
     expect(getPackageName()).toBeTruthy();
   });
 });
