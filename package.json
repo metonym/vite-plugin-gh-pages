@@ -8,16 +8,16 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "test": "vitest",
-    "prepack": "tsc"
+    "build": "bun --bun tsc"
   },
   "dependencies": {
     "gh-pages": "^6.1.1"
   },
   "devDependencies": {
     "@types/gh-pages": "^6.1.0",
-    "@types/node": "^20.11.17",
-    "typescript": "^5.3.3",
-    "vitest": "^1.2.2"
+    "@types/node": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
   },
   "repository": {
     "type": "git",
