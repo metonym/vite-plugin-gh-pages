@@ -7,14 +7,17 @@ This plugin uses [gh-pages](https://github.com/tschaub/gh-pages) to publish your
 ## Installation
 
 ```bash
-# Yarn
-yarn add -D vite-plugin-gh-pages
-
 # NPM
 npm i -D vite-plugin-gh-pages
 
 # pnpm
 pnpm i -D vite-plugin-gh-pages
+
+# Bun
+bun i -D vite-plugin-gh-pages
+
+# Yarn
+yarn add -D vite-plugin-gh-pages
 ```
 
 ## Usage
