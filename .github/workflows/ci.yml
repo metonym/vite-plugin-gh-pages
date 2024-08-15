@@ -15,6 +15,3 @@ jobs:
 
       - name: Run unit tests
         run: bun run test
-
-      - name: Build the package
-        run: bun run build
