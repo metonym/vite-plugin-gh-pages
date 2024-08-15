@@ -4,7 +4,7 @@ import { getPackageName } from "./get-package-name";
 
 type CallbackPublishOptions = PublishOptions & { outDir: string };
 
-interface GhPagesOptions extends PublishOptions {
+type GhPagesOptions = PublishOptions & {
   onBeforePublish?: (publishOptions: CallbackPublishOptions) => void;
   onPublish?: (publishOptions: CallbackPublishOptions) => void;
   onError?: Parameters<typeof publish>[2];
