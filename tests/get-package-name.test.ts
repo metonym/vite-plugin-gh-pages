@@ -1,25 +1,40 @@
-import { describe, expect, test, vi } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { getPackageName } from "../src/get-package-name";
 
-describe("get-package-name", () => {
-  test("no package.json", () => {
-    const mockCwd = vi.spyOn(process, "cwd");
-    mockCwd.mockReturnValue("/");
+vi.mock("node:fs");
+vi.mock("node:path");
+
+describe("getPackageName", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  test("returns undefined when package.json does not exist", () => {
+    vi.spyOn(fs, "existsSync").mockReturnValue(false);
 
     expect(getPackageName()).toBeUndefined();
   });
 
-  test("valid package.json without name", () => {
-    const mockCwd = vi.spyOn(process, "cwd");
-    mockCwd.mockReturnValue("tests");
+  test("returns undefined when package.json exists but has no name", () => {
+    vi.spyOn(fs, "existsSync").mockReturnValue(true);
+    vi.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify({}));
+    vi.spyOn(path, "resolve").mockReturnValue("/fake/path/package.json");
 
     expect(getPackageName()).toBeUndefined();
   });
 
-  test("valid package.json", () => {
-    const mockCwd = vi.spyOn(process, "cwd");
-    mockCwd.mockReturnValue(".");
+  test("returns package name when package.json exists and has name", () => {
+    const mockPackage = { name: "test-package" };
+    vi.spyOn(fs, "existsSync").mockReturnValue(true);
+    vi.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockPackage));
+    vi.spyOn(path, "resolve").mockReturnValue("/fake/path/package.json");
 
-    expect(getPackageName()).toBeTruthy();
+    expect(getPackageName()).toBe("test-package");
   });
 });
