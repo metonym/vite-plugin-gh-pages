@@ -4,6 +4,14 @@
 
 This plugin uses [gh-pages](https://github.com/tschaub/gh-pages) to publish your app to GitHub Pages when running `vite build`.
 
+## Features
+
+- 🚀 Zero-config deployment to GitHub Pages
+- 🎯 Automatic base URL configuration from package name
+- ⚡️ Lifecycle hooks for custom deployment logic
+- 📄 Preserves dotfiles and adds `.nojekyll` by default
+- 🔄 Customizable branch and commit options
+
 ## Installation
 
 ```bash
@@ -52,11 +60,12 @@ If no value for `base` is specified, the plugin will attempt to infer the value 
 
 ## Options
 
-Additional plugin options are passed to `gh-pages`.
+Additional plugin options are passed to `gh-pages`. All options from the `gh-pages` package are supported, plus additional lifecycle hooks.
 
 ```js
 ghPages({
   branch: "docs",
+  message: "Custom deploy message",
 });
 ```
 
@@ -175,13 +184,11 @@ interface GhPagesOptions {
 
 </details>
 
-## Callbacks
+## Lifecycle Hooks
 
 ### `onBeforePublish`
 
-`onBeforePublish` is invoked before publishing to GitHub Pages.
-
-This is useful for writing additional files to the `outDir`.
+Called before publishing to GitHub Pages. Useful for writing additional files to the `outDir`.
 
 ```js
 import fs from "node:fs";
@@ -195,7 +202,7 @@ export default {
       /** @type {options: GhPagesOptions & { outDir: string } => void} */
       onBeforePublish: (options) => {
         const CNAME = path.join(options.outDir, "CNAME");
-        fs.writeFileSync(CNAME, "...");
+        fs.writeFileSync(CNAME, "example.com");
       },
     }),
   ],
@@ -204,26 +211,56 @@ export default {
 
 ### `onPublish`
 
-`onPublish` is invoked if `gh-pages` has successfully published the folder.
+Called after successful deployment to GitHub Pages.
 
 ```js
 ghPages({
   /** @type {options: GhPagesOptions & { outDir: string } => void} */
   onPublish: (options) => {
-    // ...
+    console.log(`🎉 Successfully deployed to ${options.branch}!`);
   },
 });
 ```
 
 ### `onError`
 
-`onError` is called if a publishing error occurred.
+Called if a publishing error occurs.
 
 ```js
 ghPages({
   /** @type {(error: any) => void} **/
   onError: (error) => {
-    // ...
+    console.error("Deployment failed:", error);
+    process.exit(1);
+  },
+});
+```
+
+## Examples
+
+### Custom Branch and CNAME
+
+```js
+ghPages({
+  branch: "production",
+  onBeforePublish: ({ outDir }) => {
+    fs.writeFileSync(path.join(outDir, "CNAME"), "mysite.com");
+  },
+});
+```
+
+### Deployment Progress Tracking
+
+```js
+ghPages({
+  onBeforePublish: ({ outDir }) => {
+    console.log(`📦 Starting deployment from ${outDir}...`);
+  },
+  onPublish: ({ branch }) => {
+    console.log(`🎉 Successfully deployed to ${branch}!`);
+  },
+  onError: (error) => {
+    console.error("❌ Deployment failed:", error);
   },
 });
 ```
