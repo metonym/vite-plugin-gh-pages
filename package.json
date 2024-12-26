@@ -11,7 +11,7 @@
     "build": "bun --bun tsc"
   },
   "dependencies": {
-    "gh-pages": "^6.1.1"
+    "gh-pages": "^6.2.0"
   },
   "devDependencies": {
     "@types/gh-pages": "latest",
