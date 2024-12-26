@@ -1,4 +1,5 @@
-import gp, { type PublishOptions, type publish } from "gh-pages";
+import type { PublishOptions, publish } from "gh-pages";
+import gp from "gh-pages";
 import type { Plugin } from "vite";
 import { getPackageName } from "./get-package-name";
 
@@ -8,7 +9,7 @@ type GhPagesOptions = PublishOptions & {
   onBeforePublish?: (publishOptions: CallbackPublishOptions) => void;
   onPublish?: (publishOptions: CallbackPublishOptions) => void;
   onError?: Parameters<typeof publish>[2];
-}
+};
 
 export const ghPages = (options?: GhPagesOptions): Plugin => {
   let outDir = "";
