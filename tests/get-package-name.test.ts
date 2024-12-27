@@ -37,4 +37,11 @@ describe("getPackageName", () => {
 
     expect(getPackageName()).toBe("test-package");
   });
+
+  test("returns undefined when package.json contains invalid JSON", () => {
+    vi.spyOn(fs, "readFileSync").mockReturnValue("{ invalid json }");
+    vi.spyOn(path, "join").mockReturnValue("/fake/path/package.json");
+
+    expect(getPackageName()).toBeUndefined();
+  });
 });
