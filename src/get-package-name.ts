@@ -1,10 +1,19 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export const getPackageName = (): undefined | string => {
-  const pkg_path = path.join(process.cwd(), "package.json");
-  if (!fs.existsSync(pkg_path)) return;
+export const getPackageName = (): string | undefined => {
+  try {
+    const pkg_path = path.join(process.cwd(), "package.json");
+    const content = fs.readFileSync(pkg_path, "utf-8");
+    const pkg = JSON.parse(content);
 
-  const pkg = JSON.parse(fs.readFileSync(pkg_path, "utf-8"));
-  return pkg?.name ?? undefined;
+    if (!pkg?.name || typeof pkg.name !== "string") {
+      return undefined;
+    }
+
+    return pkg.name;
+  } catch (error) {
+    // Handle file reading and JSON parsing errors.
+    return undefined;
+  }
 };
