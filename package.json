@@ -16,6 +16,7 @@
   "devDependencies": {
     "@types/gh-pages": "latest",
     "@types/node": "latest",
+    "culls": "^0.1.1",
     "typescript": "latest",
     "vitest": "latest"
   },
