@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
+    "erasableSyntaxOnly": true,
     "esModuleInterop": true,
     "module": "CommonJS",
     "moduleResolution": "node",
