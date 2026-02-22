@@ -15,10 +15,10 @@
   },
   "devDependencies": {
     "@types/gh-pages": "latest",
-    "@types/node": "latest",
-    "culls": "^0.1.2",
+    "@types/node": "25.3.0",
+    "culls": "^0.2.0",
     "typescript": "latest",
-    "vitest": "latest"
+    "vitest": "4.0.18"
   },
   "repository": {
     "type": "git",
