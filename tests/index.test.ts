@@ -1,16 +1,15 @@
+import { afterEach, beforeEach, describe, expect, test, mock, spyOn } from "bun:test";
 import gp from "gh-pages";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getPackageName } from "../src/get-package-name";
+import * as getPackageNameModule from "../src/get-package-name";
 import { ghPages } from "../src/index";
 
-vi.mock("gh-pages", () => ({
-  default: {
-    publish: vi.fn(),
-  },
-}));
+const mockPublish = mock(() => {});
 
-vi.mock("../src/get-package-name", () => ({
-  getPackageName: vi.fn(() => "test-package"),
+// Mock gh-pages module
+mock.module("gh-pages", () => ({
+  default: {
+    publish: mockPublish,
+  },
 }));
 
 // Stub Vite plugin return type since it's not intended as a public API.
@@ -28,26 +27,22 @@ type VitePlugin = {
 };
 
 describe("ghPages plugin", () => {
-  const mockConsoleLog = vi.spyOn(console, "log");
-
   const mockConfigEnv = {
     command: "build",
     mode: "production",
   } as const;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(gp.publish).mockImplementation((dir, options, callback) => {
+    mockPublish.mockClear();
+    mockPublish.mockImplementation((dir: string, options: any, callback: any) => {
       callback?.(null);
       return Promise.resolve();
     });
   });
 
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
-  it("should set default base URL if undefined", () => {
+  test("should set default base URL if undefined", () => {
+    const mockGetPackageName = spyOn(getPackageNameModule, "getPackageName").mockReturnValue("test-package");
+    
     const plugin = ghPages();
     const config = {};
 
@@ -56,10 +51,14 @@ describe("ghPages plugin", () => {
     }
 
     expect(config).toEqual({ base: "/test-package/" });
-    expect(getPackageName).toHaveBeenCalled();
+    expect(mockGetPackageName).toHaveBeenCalled();
+    
+    mockGetPackageName.mockRestore();
   });
 
-  it("should not override existing base URL", () => {
+  test("should not override existing base URL", () => {
+    const mockGetPackageName = spyOn(getPackageNameModule, "getPackageName").mockReturnValue("test-package");
+    
     const plugin = ghPages();
     const config = { base: "/custom-base/" };
 
@@ -68,10 +67,12 @@ describe("ghPages plugin", () => {
     }
 
     expect(config).toEqual({ base: "/custom-base/" });
-    expect(getPackageName).not.toHaveBeenCalled();
+    expect(mockGetPackageName).not.toHaveBeenCalled();
+    
+    mockGetPackageName.mockRestore();
   });
 
-  it("should store outDir from resolved config", () => {
+  test("should store outDir from resolved config", () => {
     const plugin = ghPages() as VitePlugin;
     const config = { build: { outDir: "dist" } };
 
@@ -84,8 +85,8 @@ describe("ghPages plugin", () => {
     );
   });
 
-  it("should call onBeforePublish with correct options", async () => {
-    const onBeforePublish = vi.fn();
+  test("should call onBeforePublish with correct options", async () => {
+    const onBeforePublish = mock();
     const plugin = ghPages({ onBeforePublish }) as VitePlugin;
     const config = { build: { outDir: "dist" } };
 
@@ -101,8 +102,8 @@ describe("ghPages plugin", () => {
     });
   });
 
-  it("should call onPublish with correct options on success", async () => {
-    const onPublish = vi.fn();
+  test("should call onPublish with correct options on success", async () => {
+    const onPublish = mock();
     const plugin = ghPages({ onPublish }) as VitePlugin;
     const config = { build: { outDir: "dist" } };
 
@@ -118,14 +119,14 @@ describe("ghPages plugin", () => {
     });
   });
 
-  it("should call onError when publish fails", async () => {
+  test("should call onError when publish fails", async () => {
     // Mock publish to simulate an error
-    vi.mocked(gp.publish).mockImplementationOnce((dir, options, callback) => {
+    mockPublish.mockImplementationOnce((dir: string, options: any, callback: any) => {
       callback?.(new Error("Publish failed"));
       return Promise.resolve();
     });
 
-    const onError = vi.fn();
+    const onError = mock();
     const plugin = ghPages({ onError }) as VitePlugin;
     const config = { build: { outDir: "dist" } };
 
@@ -135,8 +136,13 @@ describe("ghPages plugin", () => {
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
   });
 
-  it("should use default error handler when onError not provided", async () => {
-    vi.mocked(gp.publish).mockImplementationOnce((dir, options, callback) => {
+  test("should use default error handler when onError not provided", async () => {
+    // Capture console.log calls for this specific test
+    const originalConsoleLog = console.log;
+    const logCalls: any[] = [];
+    console.log = (...args: any[]) => logCalls.push(args);
+
+    mockPublish.mockImplementationOnce((dir: string, options: any, callback: any) => {
       callback?.(new Error("Publish failed"));
       return Promise.resolve();
     });
@@ -147,10 +153,14 @@ describe("ghPages plugin", () => {
     plugin.configResolved?.(config);
     await plugin.closeBundle?.();
 
-    expect(mockConsoleLog).toHaveBeenCalledWith(expect.any(Error));
+    // Restore console.log
+    console.log = originalConsoleLog;
+
+    expect(logCalls.length).toBe(1);
+    expect(logCalls[0][0]).toBeInstanceOf(Error);
   });
 
-  it("should merge custom options with defaults", async () => {
+  test("should merge custom options with defaults", async () => {
     const customOptions = {
       branch: "custom-branch",
       message: "Custom commit message",

@@ -7,7 +7,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "vitest",
+    "test": "bun test",
     "build": "bun --bun tsc"
   },
   "dependencies": {
@@ -17,8 +17,7 @@
     "@types/gh-pages": "^6.1.0",
     "@types/node": "25.6.0",
     "culls": "^0.2.0",
-    "typescript": "6.0.3",
-    "vitest": "4.1.5"
+    "typescript": "6.0.3"
   },
   "repository": {
     "type": "git",

@@ -1,47 +1,90 @@
+import { describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { getPackageName } from "../src/get-package-name";
-
-vi.mock("node:fs");
-vi.mock("node:path");
 
 describe("getPackageName", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
   test("returns undefined when package.json does not exist", () => {
-    vi.spyOn(fs, "existsSync").mockReturnValue(false);
-
-    expect(getPackageName()).toBeUndefined();
+    // Mock fs.existsSync to return false for this test
+    const originalExistsSync = fs.existsSync;
+    const originalJoin = path.join;
+    
+    fs.existsSync = () => false;
+    path.join = () => "/fake/path/package.json";
+    
+    // Import the function after mocking
+    delete require.cache[require.resolve("../src/get-package-name")];
+    const { getPackageName } = require("../src/get-package-name");
+    
+    const result = getPackageName();
+    
+    // Restore original functions
+    fs.existsSync = originalExistsSync;
+    path.join = originalJoin;
+    
+    expect(result).toBeUndefined();
   });
 
   test("returns undefined when package.json exists but has no name", () => {
-    vi.spyOn(fs, "existsSync").mockReturnValue(true);
-    vi.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify({}));
-    vi.spyOn(path, "resolve").mockReturnValue("/fake/path/package.json");
-
-    expect(getPackageName()).toBeUndefined();
+    const originalExistsSync = fs.existsSync;
+    const originalReadFileSync = fs.readFileSync;
+    const originalJoin = path.join;
+    
+    fs.existsSync = () => true;
+    fs.readFileSync = () => JSON.stringify({});
+    path.join = () => "/fake/path/package.json";
+    
+    delete require.cache[require.resolve("../src/get-package-name")];
+    const { getPackageName } = require("../src/get-package-name");
+    
+    const result = getPackageName();
+    
+    fs.existsSync = originalExistsSync;
+    fs.readFileSync = originalReadFileSync;
+    path.join = originalJoin;
+    
+    expect(result).toBeUndefined();
   });
 
   test("returns package name when package.json exists and has name", () => {
     const mockPackage = { name: "test-package" };
-    vi.spyOn(fs, "existsSync").mockReturnValue(true);
-    vi.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockPackage));
-    vi.spyOn(path, "resolve").mockReturnValue("/fake/path/package.json");
-
-    expect(getPackageName()).toBe("test-package");
+    const originalExistsSync = fs.existsSync;
+    const originalReadFileSync = fs.readFileSync;
+    const originalJoin = path.join;
+    
+    fs.existsSync = () => true;
+    fs.readFileSync = () => JSON.stringify(mockPackage);
+    path.join = () => "/fake/path/package.json";
+    
+    delete require.cache[require.resolve("../src/get-package-name")];
+    const { getPackageName } = require("../src/get-package-name");
+    
+    const result = getPackageName();
+    
+    fs.existsSync = originalExistsSync;
+    fs.readFileSync = originalReadFileSync;
+    path.join = originalJoin;
+    
+    expect(result).toBe("test-package");
   });
 
   test("returns undefined when package.json contains invalid JSON", () => {
-    vi.spyOn(fs, "readFileSync").mockReturnValue("{ invalid json }");
-    vi.spyOn(path, "join").mockReturnValue("/fake/path/package.json");
-
-    expect(getPackageName()).toBeUndefined();
+    const originalExistsSync = fs.existsSync;
+    const originalReadFileSync = fs.readFileSync;
+    const originalJoin = path.join;
+    
+    fs.existsSync = () => true;
+    fs.readFileSync = () => "{ invalid json }";
+    path.join = () => "/fake/path/package.json";
+    
+    delete require.cache[require.resolve("../src/get-package-name")];
+    const { getPackageName } = require("../src/get-package-name");
+    
+    const result = getPackageName();
+    
+    fs.existsSync = originalExistsSync;
+    fs.readFileSync = originalReadFileSync;
+    path.join = originalJoin;
+    
+    expect(result).toBeUndefined();
   });
 });
