@@ -4,8 +4,8 @@
     "erasableSyntaxOnly": true,
     "esModuleInterop": true,
     "module": "CommonJS",
-    "moduleResolution": "node",
     "outDir": "dist",
+    "rootDir": "src",
     "skipLibCheck": true,
     "strict": true,
     "target": "ES6"
