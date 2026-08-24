@@ -12,8 +12,7 @@ export const getPackageName = (): string | undefined => {
     }
 
     return pkg.name;
-  } catch (error) {
-    // Handle file reading and JSON parsing errors.
+  } catch {
     return undefined;
   }
 };

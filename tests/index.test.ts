@@ -5,14 +5,13 @@ import { ghPages } from "../src/index";
 
 const mockPublish = mock(() => {});
 
-// Mock gh-pages module
 mock.module("gh-pages", () => ({
   default: {
     publish: mockPublish,
   },
 }));
 
-// Stub Vite plugin return type since it's not intended as a public API.
+// Vite's Plugin type is not part of this package's public API.
 type VitePlugin = {
   name?: string;
   config: (
@@ -120,7 +119,6 @@ describe("ghPages plugin", () => {
   });
 
   test("should call onError when publish fails", async () => {
-    // Mock publish to simulate an error
     mockPublish.mockImplementationOnce((dir: string, options: any, callback: any) => {
       callback?.(new Error("Publish failed"));
       return Promise.resolve();
@@ -137,7 +135,6 @@ describe("ghPages plugin", () => {
   });
 
   test("should use default error handler when onError not provided", async () => {
-    // Capture console.log calls for this specific test
     const originalConsoleLog = console.log;
     const logCalls: any[] = [];
     console.log = (...args: any[]) => logCalls.push(args);
@@ -153,7 +150,6 @@ describe("ghPages plugin", () => {
     plugin.configResolved?.(config);
     await plugin.closeBundle?.();
 
-    // Restore console.log
     console.log = originalConsoleLog;
 
     expect(logCalls.length).toBe(1);

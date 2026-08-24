@@ -4,20 +4,17 @@ import path from "node:path";
 
 describe("getPackageName", () => {
   test("returns undefined when package.json does not exist", () => {
-    // Mock fs.existsSync to return false for this test
     const originalExistsSync = fs.existsSync;
     const originalJoin = path.join;
     
     fs.existsSync = () => false;
     path.join = () => "/fake/path/package.json";
     
-    // Import the function after mocking
     delete require.cache[require.resolve("../src/get-package-name")];
     const { getPackageName } = require("../src/get-package-name");
     
     const result = getPackageName();
     
-    // Restore original functions
     fs.existsSync = originalExistsSync;
     path.join = originalJoin;
     
