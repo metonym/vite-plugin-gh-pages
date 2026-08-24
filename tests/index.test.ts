@@ -1,9 +1,27 @@
-import { afterEach, beforeEach, describe, expect, test, mock, spyOn } from "bun:test";
+import { beforeEach, describe, expect, test, mock, spyOn } from "bun:test";
+import type { PublishOptions } from "gh-pages";
 import gp from "gh-pages";
+import type { ConfigEnv, ResolvedConfig, UserConfig } from "vite";
 import * as getPackageNameModule from "../src/get-package-name";
 import { ghPages } from "../src/index";
 
-const mockPublish = mock(() => {});
+type PublishCallback = (err: Error | null) => void;
+
+function invokeHook<Args extends unknown[], Result>(
+  hook: ((...args: Args) => Result) | { handler: (...args: Args) => Result } | undefined,
+  ...args: Args
+): Result | undefined {
+  const fn = typeof hook === "function" ? hook : hook?.handler;
+  if (!fn) return undefined;
+  return (fn as (this: void, ...args: Args) => Result)(...args);
+}
+
+const mockPublish = mock(
+  (_dir: string, _options: PublishOptions, callback?: PublishCallback) => {
+    callback?.(null);
+    return Promise.resolve();
+  },
+);
 
 mock.module("gh-pages", () => ({
   default: {
@@ -11,72 +29,56 @@ mock.module("gh-pages", () => ({
   },
 }));
 
-// Vite's Plugin type is not part of this package's public API.
-type VitePlugin = {
-  name?: string;
-  config: (
-    config: Record<string, any>,
-    env: {
-      command: string;
-      mode: string;
-    }
-  ) => void;
-  configResolved?: (config: { build: { outDir: string } }) => void;
-  closeBundle?: () => Promise<void> | void;
-};
-
 describe("ghPages plugin", () => {
-  const mockConfigEnv = {
+  const mockConfigEnv: ConfigEnv = {
     command: "build",
     mode: "production",
-  } as const;
+  };
 
   beforeEach(() => {
     mockPublish.mockClear();
-    mockPublish.mockImplementation((dir: string, options: any, callback: any) => {
-      callback?.(null);
-      return Promise.resolve();
-    });
+    mockPublish.mockImplementation(
+      (_dir: string, _options: PublishOptions, callback?: PublishCallback) => {
+        callback?.(null);
+        return Promise.resolve();
+      },
+    );
   });
 
   test("should set default base URL if undefined", () => {
     const mockGetPackageName = spyOn(getPackageNameModule, "getPackageName").mockReturnValue("test-package");
-    
-    const plugin = ghPages();
-    const config = {};
 
-    if (typeof plugin.config === "function") {
-      plugin.config(config, mockConfigEnv);
-    }
+    const plugin = ghPages();
+    const config: UserConfig = {};
+
+    invokeHook(plugin.config, config, mockConfigEnv);
 
     expect(config).toEqual({ base: "/test-package/" });
     expect(mockGetPackageName).toHaveBeenCalled();
-    
+
     mockGetPackageName.mockRestore();
   });
 
   test("should not override existing base URL", () => {
     const mockGetPackageName = spyOn(getPackageNameModule, "getPackageName").mockReturnValue("test-package");
-    
-    const plugin = ghPages();
-    const config = { base: "/custom-base/" };
 
-    if (typeof plugin.config === "function") {
-      plugin.config(config, mockConfigEnv);
-    }
+    const plugin = ghPages();
+    const config: UserConfig = { base: "/custom-base/" };
+
+    invokeHook(plugin.config, config, mockConfigEnv);
 
     expect(config).toEqual({ base: "/custom-base/" });
     expect(mockGetPackageName).not.toHaveBeenCalled();
-    
+
     mockGetPackageName.mockRestore();
   });
 
   test("should store outDir from resolved config", () => {
-    const plugin = ghPages() as VitePlugin;
-    const config = { build: { outDir: "dist" } };
+    const plugin = ghPages();
+    const config = { build: { outDir: "dist" } } as ResolvedConfig;
 
-    plugin.configResolved?.(config);
-    plugin.closeBundle?.();
+    invokeHook(plugin.configResolved, config);
+    invokeHook(plugin.closeBundle);
     expect(gp.publish).toHaveBeenCalledWith(
       "dist",
       expect.any(Object),
@@ -86,11 +88,11 @@ describe("ghPages plugin", () => {
 
   test("should call onBeforePublish with correct options", async () => {
     const onBeforePublish = mock();
-    const plugin = ghPages({ onBeforePublish }) as VitePlugin;
-    const config = { build: { outDir: "dist" } };
+    const plugin = ghPages({ onBeforePublish });
+    const config = { build: { outDir: "dist" } } as ResolvedConfig;
 
-    plugin.configResolved?.(config);
-    await plugin.closeBundle?.();
+    invokeHook(plugin.configResolved, config);
+    await invokeHook(plugin.closeBundle);
 
     expect(onBeforePublish).toHaveBeenCalledWith({
       dotfiles: true,
@@ -103,11 +105,11 @@ describe("ghPages plugin", () => {
 
   test("should call onPublish with correct options on success", async () => {
     const onPublish = mock();
-    const plugin = ghPages({ onPublish }) as VitePlugin;
-    const config = { build: { outDir: "dist" } };
+    const plugin = ghPages({ onPublish });
+    const config = { build: { outDir: "dist" } } as ResolvedConfig;
 
-    plugin.configResolved?.(config);
-    await plugin.closeBundle?.();
+    invokeHook(plugin.configResolved, config);
+    await invokeHook(plugin.closeBundle);
 
     expect(onPublish).toHaveBeenCalledWith({
       dotfiles: true,
@@ -119,36 +121,40 @@ describe("ghPages plugin", () => {
   });
 
   test("should call onError when publish fails", async () => {
-    mockPublish.mockImplementationOnce((dir: string, options: any, callback: any) => {
-      callback?.(new Error("Publish failed"));
-      return Promise.resolve();
-    });
+    mockPublish.mockImplementationOnce(
+      (_dir: string, _options: PublishOptions, callback?: PublishCallback) => {
+        callback?.(new Error("Publish failed"));
+        return Promise.resolve();
+      },
+    );
 
     const onError = mock();
-    const plugin = ghPages({ onError }) as VitePlugin;
-    const config = { build: { outDir: "dist" } };
+    const plugin = ghPages({ onError });
+    const config = { build: { outDir: "dist" } } as ResolvedConfig;
 
-    plugin.configResolved?.(config);
-    await plugin.closeBundle?.();
+    invokeHook(plugin.configResolved, config);
+    await invokeHook(plugin.closeBundle);
 
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
   });
 
   test("should use default error handler when onError not provided", async () => {
     const originalConsoleLog = console.log;
-    const logCalls: any[] = [];
-    console.log = (...args: any[]) => logCalls.push(args);
+    const logCalls: unknown[][] = [];
+    console.log = (...args: unknown[]) => logCalls.push(args);
 
-    mockPublish.mockImplementationOnce((dir: string, options: any, callback: any) => {
-      callback?.(new Error("Publish failed"));
-      return Promise.resolve();
-    });
+    mockPublish.mockImplementationOnce(
+      (_dir: string, _options: PublishOptions, callback?: PublishCallback) => {
+        callback?.(new Error("Publish failed"));
+        return Promise.resolve();
+      },
+    );
 
-    const plugin = ghPages() as VitePlugin;
-    const config = { build: { outDir: "dist" } };
+    const plugin = ghPages();
+    const config = { build: { outDir: "dist" } } as ResolvedConfig;
 
-    plugin.configResolved?.(config);
-    await plugin.closeBundle?.();
+    invokeHook(plugin.configResolved, config);
+    await invokeHook(plugin.closeBundle);
 
     console.log = originalConsoleLog;
 
@@ -162,11 +168,11 @@ describe("ghPages plugin", () => {
       message: "Custom commit message",
     };
 
-    const plugin = ghPages(customOptions) as VitePlugin;
-    const config = { build: { outDir: "dist" } };
+    const plugin = ghPages(customOptions);
+    const config = { build: { outDir: "dist" } } as ResolvedConfig;
 
-    plugin.configResolved?.(config);
-    await plugin.closeBundle?.();
+    invokeHook(plugin.configResolved, config);
+    await invokeHook(plugin.closeBundle);
 
     expect(gp.publish).toHaveBeenCalledWith(
       "dist",
