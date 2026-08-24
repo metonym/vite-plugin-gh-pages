@@ -14,6 +14,7 @@
     "gh-pages": "^6.3.0"
   },
   "devDependencies": {
+    "@types/bun": "^1.4.0",
     "@types/gh-pages": "^6.1.0",
     "@types/node": "26.2.0",
     "culls": "^0.2.0",
