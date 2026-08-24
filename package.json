@@ -8,16 +8,17 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "test": "bun test",
-    "build": "tsgo"
+    "build": "tsc"
   },
   "dependencies": {
     "gh-pages": "^6.3.0"
   },
   "devDependencies": {
     "@types/gh-pages": "^6.1.0",
-    "@types/node": "25.6.0",
-    "@typescript/native-preview": "^7.0.0-dev.20260505.1",
-    "culls": "^0.2.0"
+    "@types/node": "26.2.0",
+    "culls": "^0.2.0",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.2"
   },
   "repository": {
     "type": "git",
