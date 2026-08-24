@@ -1,12 +1,13 @@
 {
   "name": "vite-plugin-gh-pages",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build"
   },
   "devDependencies": {
-    "vite": "^7.3.2",
+    "vite": "^8.2.2",
     "vite-plugin-gh-pages": "link:vite-plugin-gh-pages"
   }
 }
